@@ -35,7 +35,7 @@
         var scene = new THREE.Scene();
 
         // create a camera, which defines where we're looking at.
-        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
 		
 
         // create a render and set the size
@@ -53,6 +53,9 @@
         var planeGeometry = new THREE.PlaneGeometry(60, 60, 20, 20);
         var planeMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, side:THREE.DoubleSide});
         var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        var plane2 = new THREE.Mesh(planeGeometry, planeMaterial);
+        var plane3 = new THREE.Mesh(planeGeometry, planeMaterial);
+        var plane4 = new THREE.Mesh(planeGeometry, planeMaterial);
         plane.receiveShadow = true;
 
         // rotate and position the plane
@@ -60,12 +63,33 @@
         plane.position.x = 15
         plane.position.y = 0
         plane.position.z = 0
-
+        
+        // plane2.rotation.x = - 2 *Math.PI;
+        // plane2.rotation.y = Math.PI;
+        // plane2.rotation.z = Math.PI;
+        plane2.receiveShadow = true;
+        plane2.position.x = 15
+        plane2.position.y = 30
+        plane2.position.z = 30
+        
+        plane3.receiveShadow = true;
+        plane3.position.x = 15
+        plane3.position.y = 30
+        plane3.position.z = -30
+        
+        plane4.rotation.y = -0.5 * Math.PI;
+        plane4.receiveShadow = true;
+        plane4.position.x = 45
+        plane4.position.y = 30
+        plane4.position.z = 0
         // add the plane to the scene
         scene.add(plane);
+        scene.add(plane2);
+        scene.add(plane3);
+        scene.add(plane4);
 
         // create a cube
-        var cubeGeometry = new THREE.CubeGeometry(4, 4, 4);
+        var cubeGeometry = new THREE.CubeGeometry(6, 6, 6);
         var cubeMaterial = new THREE.MeshPhongMaterial({color: 0xff0000});
         var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
         cube.castShadow = true;
@@ -73,8 +97,16 @@
 
         // position the cube
         cube.position.x = -4;
-        cube.position.y = 3;
+        cube.position.y = 12;
         cube.position.z = 0;
+
+        var cube2 = cube.clone();
+        cube2.castShadow = true;
+        cube2.receiveShadow = true;
+        cube2.position.x = 16;
+        cube2.position.y = 3;
+        cube2.position.z = 0;
+        scene.add(cube2);
 
         // add the cube to the scene
         scene.add(cube);
@@ -112,13 +144,14 @@
 		spotLight.angle = 0.25;
 		spotLight.penumbra = .7;
 		// spotLight.target = sphere;
-		var helper = new THREE.CameraHelper( spotLight.shadow.camera );
-        scene.add( helper );
+		// var helper = new THREE.CameraHelper( spotLight.shadow.camera );
+        // scene.add( helper );
 		spotLight.shadow.camera.near = 0.1;
 		spotLight.shadow.camera.far = 100;
 		spotLight.shadow.camera.fov = 30;
 		spotLight.shadow.mapSize.width = 2048;
 		spotLight.shadow.mapSize.height = 2048;
+        spotLight.target = cube;
 		
         		
         scene.add(spotLight);
@@ -144,9 +177,11 @@
         anotherSpotLight2.angle = 0.35;
         anotherSpotLight2.penumbra = 1
         scene.add(anotherSpotLight2);
+        anotherSpotLight.target = sphere;
+        anotherSpotLight2.target = sphere;
 
-        var helper2 = new THREE.CameraHelper( anotherSpotLight2.shadow.camera );
-        scene.add( helper2 );
+        // var helper2 = new THREE.CameraHelper( anotherSpotLight2.shadow.camera );
+        // scene.add( helper2 );
 
         // add the output of the renderer to the html element
         $("#WebGL-output").append(renderer.domElement);
@@ -157,8 +192,9 @@
         var controls = {
             rotationSpeed: 0.02,
             bouncingSpeed: 0.03,
+            cubeSlidingSpeed: 0.3,
             ambientColor: ambiColor,
-            targetSphere: false,
+            targetSphere: true,
         }
 
         var gui = new dat.GUI();
@@ -171,14 +207,22 @@
         gui.add(controls, 'bouncingSpeed').onChange( (v) => {
             rotationSpeed = v
         });
+        gui.add(controls, 'cubeSlidingSpeed').onChange( (v) => {
+            cubeSlidingSpeed = v
+        });
         gui.add(controls, 'targetSphere').onChange( (v) => {
-            if (v) 
-                spotLight.target = sphere;
-            else
-                spotLight.target = plane;
+            if (v) {
+                anotherSpotLight.target = sphere;
+                anotherSpotLight2.target = sphere;
+                
+            }
+            else {
+                anotherSpotLight.target = plane;
+                anotherSpotLight2.target = plane;
+            }
 
         });
-
+        mod = 1;
 
         render();
 
@@ -188,6 +232,15 @@
             cube.rotation.x += controls.rotationSpeed;
             cube.rotation.y += controls.rotationSpeed;
             cube.rotation.z += controls.rotationSpeed;
+
+            if (cube2.position.z >= 12){
+                mod= -1;
+            }
+            else if (cube2.position.z <= -12){
+                mod = 1;
+            }
+            cube2.position.z += mod*controls.cubeSlidingSpeed;
+
 
             // bounce the sphere up and down
             step += controls.bouncingSpeed;
