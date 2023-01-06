@@ -25,7 +25,7 @@
 
 			var clock = new THREE.Clock();
 
-			var mixer;
+			var mixers = [];
 
 			init();
 			animate();
@@ -70,26 +70,67 @@
 
 				// model
 				var loader = new THREE.FBXLoader();
-				loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
-
-					mixer = new THREE.AnimationMixer( object );
-
+				loader.load( 'models/fbx/sophia.fbx', function ( object ) {
+					let mixer = new THREE.AnimationMixer( object );
 					var action = mixer.clipAction( object.animations[ 0 ] );
 					action.play();
-
+					mixers.push(mixer);
 					object.traverse( function ( child ) {
-
 						if ( child.isMesh ) {
-
 							child.castShadow = true;
 							child.receiveShadow = true;
-
 						}
-
 					} );
-
+					object.rotation.x = 0;
+					object.position.x = -120;
 					scene.add( object );
 
+				} );
+				loader.load( 'models/fbx/nathan.fbx', function ( object ) {
+					let mixer = new THREE.AnimationMixer( object );
+					var action = mixer.clipAction( object.animations[ 0 ] );
+					action.play();
+					mixers.push(mixer);
+					object.traverse( function ( child ) {
+						if ( child.isMesh ) {
+							child.castShadow = true;
+							child.receiveShadow = true;
+						}
+					} );
+					object.rotation.x = 0;
+					object.rotation.y = 1;
+					object.position.x = -80;
+					object.position.z = 100;
+					scene.add( object );
+				} );
+				loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
+					let mixer = new THREE.AnimationMixer( object );
+					var action = mixer.clipAction( object.animations[ 0 ] );
+					action.play();
+					mixers.push(mixer);
+					object.traverse( function ( child ) {
+						if ( child.isMesh ) {
+							child.castShadow = true;
+							child.receiveShadow = true;
+						}
+					} );
+					scene.add( object );
+				} );
+				loader.load( 'models/fbx/mateusz.fbx', function ( object ) {
+					let mixer = new THREE.AnimationMixer( object );
+					var action = mixer.clipAction( object.animations[ 0 ] );
+					action.play();
+					mixers.push(mixer);
+					object.traverse( function ( child ) {
+						if ( child.isMesh ) {
+							child.castShadow = true;
+							child.receiveShadow = true;
+						}
+					} );
+					object.rotation.x = 0;
+					object.rotation.y = 0;
+					object.position.x = 120
+					scene.add( object );
 				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -122,15 +163,14 @@
 			//
 
 			function animate() {
-
 				requestAnimationFrame( animate );
-
 				var delta = clock.getDelta();
-
-				if ( mixer ) mixer.update( delta );
-
+				if ( mixers.length > 0 ){
+					mixers.forEach(mixer => {
+						mixer.update( delta );
+					});
+				}
 				renderer.render( scene, camera );
-
 				stats.update();
 
 			}
