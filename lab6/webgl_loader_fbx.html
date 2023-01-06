@@ -86,23 +86,6 @@
 					scene.add( object );
 
 				} );
-				loader.load( 'models/fbx/nathan.fbx', function ( object ) {
-					let mixer = new THREE.AnimationMixer( object );
-					var action = mixer.clipAction( object.animations[ 0 ] );
-					action.play();
-					mixers.push(mixer);
-					object.traverse( function ( child ) {
-						if ( child.isMesh ) {
-							child.castShadow = true;
-							child.receiveShadow = true;
-						}
-					} );
-					object.rotation.x = 0;
-					object.rotation.y = 1;
-					object.position.x = -80;
-					object.position.z = 100;
-					scene.add( object );
-				} );
 				loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
 					let mixer = new THREE.AnimationMixer( object );
 					var action = mixer.clipAction( object.animations[ 0 ] );
@@ -129,7 +112,7 @@
 					} );
 					object.rotation.x = 0;
 					object.rotation.y = 0;
-					object.position.x = 120
+					object.position.x = 140
 					scene.add( object );
 				} );
 
